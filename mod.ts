@@ -110,11 +110,17 @@ export default function (userOptions: Partial<Options>) {
       const sources: Source[] = [];
 
       for (const source of options.sources) {
-        console.log(`📡 Fetching ${source}`);
-        const feed = await parser.parseURL(source);
-
-        articles.push(...getItemsFromFeed(feed, options));
-        sources.push(getSourceFromFeed(feed));
+        try {
+          console.log(`📡 Fetching ${source}`);
+          const feed = await parser.parseURL(source);
+  
+          articles.push(...getItemsFromFeed(feed, options));
+          sources.push(getSourceFromFeed(feed));
+        }
+        catch (err: unknown) {
+          const e = err as Error;
+          console.log(`❌ Failed fetching ${source}: ${e.message}`);
+        }
       }
 
       site.data(options.dataKey, articles);
